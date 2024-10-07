@@ -1,8 +1,8 @@
 # OpenAI API Key
-$apiKey = "YOUR_OPENAI_API_KEY_HERE"
+$apiKey = "YOUR_OPENAI_KEY"
 
 # Set the prompt for DALL-E
-$prompt = "An old-fashioned wallpaper with flowers and birds. Muted colors, not bright, with the texture of rough paper"
+$prompt = "A full-sized wallpaper with flowers and birds. Muted dark colors, with the texture of rough paper"
 
 # Create a JSON body with the prompt
 $body = @{
@@ -21,8 +21,8 @@ if (-not (Test-Path $outputDir)) {
 }
 
 # Generate a random 8-character alphanumeric string
-$chars = 'abcdefghijklmnopqrstuvwxyz0123456789'
-$randomString = -join ((1..8) | ForEach-Object { $chars[(Get-Random -Maximum $chars.Length)] })
+$chars = "abcdefghijklmnopqrstuvwxyz0123456789"
+$randomString = -Join ((1..8) | ForEach-Object { $chars[(Get-Random -Maximum $chars.Length)] })
 
 $outputFile = "$outputDir\dalle_generated_$randomString.jpg"
 
@@ -39,15 +39,17 @@ $imageUrl = $response.data[0].url
 # Download the image to the specified path
 Invoke-WebRequest -Uri $imageUrl -OutFile $outputFile
 
-# Set a wallpaper
+# Microsoft Window API
 $code = @"
 [DllImport("user32.dll", CharSet = CharSet.Auto)]
 public static extern int SystemParametersInfo(int uAction, int uParam, string lpvParam, int fuWinIni);
 "@
 
+# Using only Windows API functions like SystemParametersInfo,
+# it's not possible to set a wallpaper for individual monitors directly,
+# as it affects all monitors at once
 $type = Add-Type -MemberDefinition $code -Name "Wallpaper" -Namespace "Win32" -PassThru
 $SPI_SETDESKWALLPAPER = 0x0014
 $SPIF_UPDATEINIFILE = 0x01
 $SPIF_SENDCHANGE = 0x02
 $type::SystemParametersInfo($SPI_SETDESKWALLPAPER, 0, $outputFile, $SPIF_UPDATEINIFILE -bor $SPIF_SENDCHANGE)
-
