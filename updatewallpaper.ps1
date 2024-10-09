@@ -2,14 +2,14 @@
 $apiKey = "YOUR_OPENAI_KEY"
 
 # Set the prompt for DALL-E
-$prompt = "A full-sized wallpaper with flowers and birds. Muted dark colors, with the texture of rough paper"
+$prompt = "A full-sized wallpaper with flowers and birds and leaves. Muted dark colors, with the texture of rough paper."
 
 # Create a JSON body with the prompt
 $body = @{
-    "model" = "dall-e-3"
-    "prompt" = $prompt
-    "n" = 1
-    "size" = "1792x1024"
+    "model"   = "dall-e-3"
+    "prompt"  = "$prompt --ar 16:9"
+    "size"    = "1792x1024"
+    "style"   = "vivid"
 } | ConvertTo-Json
 
 # Define the output file paths
@@ -53,3 +53,6 @@ $SPI_SETDESKWALLPAPER = 0x0014
 $SPIF_UPDATEINIFILE = 0x01
 $SPIF_SENDCHANGE = 0x02
 $type::SystemParametersInfo($SPI_SETDESKWALLPAPER, 0, $outputFile, $SPIF_UPDATEINIFILE -bor $SPIF_SENDCHANGE)
+
+# More complex method described here:
+# https://hinchley.net/articles/using-powershell-to-automatically-change-the-desktop-wallpaper-based-on-screen-resolution
